@@ -10,7 +10,7 @@ const got = require('got');
 const express = require('express');
 const app = express();
 
-got('https://v.douyin.com/JPjUkFM/', {
+got('https://v.douyin.com/JPAGUg3/', {
     timeout: 10000
 })
 .then(response => {
@@ -21,10 +21,10 @@ got('https://v.douyin.com/JPjUkFM/', {
     const host = 'https://www.iesdouyin.com/web/api/v2/aweme/post/?';
     console.log(host + query);
 
-    got(host + '?sec_uid=MS4wLjABAAAAJRGd8njPGcGlqQfig55Y17_ur5y5VIGnQGIIy9pll44&count=21&max_cursor=0&aid=1128&_signature=qP.NpgAA94FAJe.bP9lNeaj.zb&dytk=')
+    got(host + query)
     .then(resList => {
         let list = Object.values(resList)
-        console.log('抖音用户数据列表',Object.keys(resList), resList);
+        console.log('抖音用户数据列表',Object.keys(resList), resList.body);
     })
     .catch(error => {
         console.log(error)
