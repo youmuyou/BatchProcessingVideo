@@ -1,0 +1,24 @@
+{
+  "name": "BatchProcessingVideo",
+  "version": "1.0.0",
+  "description": "1.批量下载抖音视频\r 2.处理水印",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pengli520/BatchProcessingVideo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pengli520/BatchProcessingVideo/issues"
+  },
+  "homepage": "https://github.com/pengli520/BatchProcessingVideo#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "got": "^11.7.0"
+  }
+}
