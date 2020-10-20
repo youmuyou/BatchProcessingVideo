@@ -10,31 +10,51 @@ const got = require('got');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const qs = require('qs');
 app.use(bodyParser.urlencoded({ extended: false }));
+// 用户列表
+const baseUrl = 'https://www.amemv.com/web/api/v2/aweme/post/?';
+// 视频地址
+const videoUrl = 'https://aweme.snssdk.com/aweme/v1/playwm/?'
+function a(path) {
+    let param = {
+        video_id: ''
+    }
+    got(path)
+    .then(resList => {
+        const res = JSON.parse(resList.body);
+        console.log('抖音用户数据列表',res.aweme_list);
+        const vidArr = res.aweme_list.map((item) => {
+            return item.video.vid;
+        })
+        console.log(vidArr)
+
+    })
+    .catch(error => {
+        console.log(error)
+    })
+}
+
 got('https://v.douyin.com/JPAGUg3/', {
     timeout: 10000
 })
 .then(response => {
-    console.log(Object.keys(response), response.url)
-    // 更换地址 获取用户列表
-    const url = response.url.replace('iesdouyin', 'amemv');
+    // console.log(response.url)
+    let arr = response.url.split('?');
+    // 获取用户 sec_uid
+    let param = qs.parse(arr[1]);
+    // 条数
+    param.count = 2
+    param.max_cursor = 0
+    param.aid = 1128
     // 抖音用户数据列表
-    const path = 'https://www.amemv.com/web/api/v2/aweme/post/?' + response.url.split('?')[1]
-    console.log(path);
-    app.post(path, function (req, res) {
-        console.log(res, '444');
-    })
-    // got(path)
-    // .then(resList => {
-    //     delete resList.body;
-    //     console.log('抖音用户数据列表',Object.keys(resList), resList);
-    // })
-    // .catch(error => {
-    //     console.log(error)
-    // })
+    const path = baseUrl + qs.stringify(param)
+    console.log(path)
+    a(path)
+
 })
 .catch(error => {
-    console.log('Something went wrong:\n' + error)
+    console.log(error)
 })
 
 
