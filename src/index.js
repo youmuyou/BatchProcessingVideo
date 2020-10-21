@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-10-19 17:01:11
- * @LastEditTime: 2020-10-21 13:49:14
+ * @LastEditTime: 2020-10-21 18:06:05
  * @LastEditors: Please set LastEditors
  * @Description: supervisor
  * @FilePath: \BatchProcessingVideo\src\index.js
@@ -16,9 +16,21 @@ const https = require('https');
 const os = require('os');
 const path = require('path');
 const fs = require('fs');
+const child = require('child_process');
+let mp4 = path.join(__dirname, '/video/2.mp4');
+const m = `ffmpeg -ss 00:00:02  -i 2.mp4 -r 1 -q:v 100 -vframes 50  -f image2 image-%d.png -y ./}`
+
+console.log(m)
+child.exec(m, (err, stdout, stderr) => {
+    if (err) {
+      console.error(JSON.stringify(err), JSON.stringify(stdout), stderr);
+      return;
+    }
+    console.log(stdout);
+  });
+
+
 app.use(bodyParser.urlencoded({ extended: false }));
-
-
 app.listen(8001, function () {
     console.log('Example app listening on port 3000!');
 });
@@ -97,5 +109,5 @@ class downVideo  {
     }
 
 }
-const downVideo1 = new downVideo({userUrl: 'https://v.douyin.com/JPAGUg3/'})
-downVideo1.shareCodeParsing()
+// const downVideo1 = new downVideo({userUrl: 'https://v.douyin.com/JPAGUg3/'})
+// downVideo1.shareCodeParsing()
