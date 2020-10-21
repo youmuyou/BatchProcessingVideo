@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-10-19 17:01:11
- * @LastEditTime: 2020-10-20 18:21:58
+ * @LastEditTime: 2020-10-21 13:49:14
  * @LastEditors: Please set LastEditors
  * @Description: supervisor
  * @FilePath: \BatchProcessingVideo\src\index.js
@@ -11,53 +11,91 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const qs = require('qs');
+const http = require('http');
+const https = require('https');
+const os = require('os');
+const path = require('path');
+const fs = require('fs');
 app.use(bodyParser.urlencoded({ extended: false }));
-// 用户列表
-const baseUrl = 'https://www.amemv.com/web/api/v2/aweme/post/?';
-// 视频地址
-const videoUrl = 'https://aweme.snssdk.com/aweme/v1/playwm/?'
-function a(path) {
-    let param = {
-        video_id: ''
-    }
-    got(path)
-    .then(resList => {
-        const res = JSON.parse(resList.body);
-        console.log('抖音用户数据列表',res.aweme_list);
-        const vidArr = res.aweme_list.map((item) => {
-            return item.video.vid;
-        })
-        console.log(vidArr)
-
-    })
-    .catch(error => {
-        console.log(error)
-    })
-}
-
-got('https://v.douyin.com/JPAGUg3/', {
-    timeout: 10000
-})
-.then(response => {
-    // console.log(response.url)
-    let arr = response.url.split('?');
-    // 获取用户 sec_uid
-    let param = qs.parse(arr[1]);
-    // 条数
-    param.count = 2
-    param.max_cursor = 0
-    param.aid = 1128
-    // 抖音用户数据列表
-    const path = baseUrl + qs.stringify(param)
-    console.log(path)
-    a(path)
-
-})
-.catch(error => {
-    console.log(error)
-})
 
 
 app.listen(8001, function () {
     console.log('Example app listening on port 3000!');
-  });
+});
+
+class downVideo  {
+    constructor(option) {
+        console.log(option)
+        this.option = option;
+        // 视频地址
+        this.videoUrl = 'https://aweme.snssdk.com/aweme/v1/playwm/?video_id='
+        // 用户列表
+        this.baseUrl = 'https://www.amemv.com/web/api/v2/aweme/post/?';
+    }
+    // 用户分享码解析
+    shareCodeParsing() {
+        got(this.option.userUrl, {
+            timeout: 10000
+        }).then(response => {
+            let arr = response.url.split('?');
+            // 获取用户 sec_uid
+            let param = qs.parse(arr[1]);
+            // 条数
+            param.count = 2
+            param.max_cursor = 0
+            param.aid = 1128
+            // 抖音用户数据列表
+            const path = this.baseUrl + qs.stringify(param)
+            this.userInfo(path)
+        }).catch(error => {
+            console.log('用户分享码解析' + error)
+        })
+    }
+
+    // 用户视频列表
+    userInfo(path) {
+        got(path).then(resList => {
+            const res = JSON.parse(resList.body);
+            for (let item of res.aweme_list) {
+                this.videoParsing(this.videoUrl + item.video.vid);
+            }
+        }).catch(error => {
+            console.log('用户视频列表' + error)
+        })
+    }
+
+    // 下载文件
+    downFile(url, name) {
+        const homeDir = __dirname || os.homedir()   //获取用户主目录地址
+        const filename = path.join(homeDir, '/video', name)  //组装文件存放地址
+        const file = fs.createWriteStream(filename)   //生成一个写入文件的流
+        let httpType
+        if (url.split('://')[0] === 'http') {   //判断是什么类型的请求
+            httpType = http
+        } else {
+            httpType = https
+        }
+
+        httpType.get(url, response => {
+            response.pipe(file)    //将文件流写入
+            response.on('end', () => {
+                console.log(filename)
+            })
+            response.on('error', err => {
+                reject(err)
+            })
+        })
+    }
+
+    // 视频地址解析
+    videoParsing(path) {
+        got(path).then(res => {
+            this.downFile(res.url, `${+new Date()}.mp4`)
+        }).catch(err => {
+            console.log('视频地址解析', err)
+        })
+    }
+
+}
+const downVideo1 = new downVideo({userUrl: 'https://v.douyin.com/JPAGUg3/'})
+downVideo1.shareCodeParsing()
