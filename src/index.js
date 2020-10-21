@@ -18,16 +18,27 @@ const path = require('path');
 const fs = require('fs');
 const child = require('child_process');
 let mp4 = path.join(__dirname, '/video/2.mp4');
-const m = `ffmpeg -ss 00:00:02  -i 2.mp4 -r 1 -q:v 100 -vframes 50  -f image2 image-%d.png -y ./}`
+const m = `ffmpeg -ss 00:00:02  -i ${mp4} -r 24 p.mp4`
 
-console.log(m)
-child.exec(m, (err, stdout, stderr) => {
-    if (err) {
-      console.error(JSON.stringify(err), JSON.stringify(stdout), stderr);
-      return;
-    }
-    console.log(stdout);
-  });
+var options = {
+    encoding: 'utf8',
+    timeout: 0,
+    maxBuffer: 200 * 1024,
+    killSignal: 'SIGTERM',
+    cwd: null,
+    env: null
+}
+child.exec('node D:/gitup/BatchProcessingVideo/src/test.js',options, (err,stdout, stderr) => {
+    console.error('错误', JSON.stringify(err),stdout, stderr);
+})
+// console.log(m.toString())
+// child.exec(m, (err, stdout, stderr) => {
+//     if (err) {
+//       console.error('错误', JSON.stringify(err));
+//       return;
+//     }
+//     console.log(stdout);
+//   });
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
